@@ -1,0 +1,54 @@
+<svg width="640" height="480" viewBox="0 0 640 480" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="goldBody" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#F6D889"/>
+      <stop offset="45%" stop-color="#E8B84A"/>
+      <stop offset="100%" stop-color="#C9922A"/>
+    </linearGradient>
+    <linearGradient id="goldWave" x1="0" y1="0" x2="1" y2="0.6">
+      <stop offset="0%" stop-color="#FFF3C4" stop-opacity="0.55"/>
+      <stop offset="100%" stop-color="#FFF3C4" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="goldEdge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#A67C1A"/>
+      <stop offset="100%" stop-color="#7A5A12"/>
+    </linearGradient>
+    <filter id="goldShadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="8" dy="28" stdDeviation="22" flood-color="#000" flood-opacity="0.45"/>
+    </filter>
+  </defs>
+
+  <!-- Back card (magnetic stripe) -->
+  <g filter="url(#goldShadow)" transform="translate(70 40) rotate(-18 200 125)">
+    <rect width="400" height="250" rx="22" fill="url(#goldBody)"/>
+    <path d="M0 40 C80 10 160 70 240 40 C320 10 360 50 400 30 L400 250 L0 250 Z" fill="url(#goldWave)" opacity="0.5"/>
+    <rect y="42" width="400" height="42" fill="#1A1A1A"/>
+    <rect x="48" y="110" width="220" height="36" rx="4" fill="#F7F4EC"/>
+    <rect x="58" y="120" width="160" height="3" rx="1.5" fill="#D0CBC0"/>
+    <rect x="58" y="128" width="140" height="3" rx="1.5" fill="#D0CBC0"/>
+    <rect x="58" y="136" width="120" height="3" rx="1.5" fill="#D0CBC0"/>
+    <rect x="0" y="0" width="12" height="250" rx="2" fill="#8B6914" opacity="0.55"/>
+  </g>
+
+  <!-- Front card -->
+  <g filter="url(#goldShadow)" transform="translate(150 120) rotate(-8 200 125)">
+    <rect width="400" height="250" rx="22" fill="url(#goldBody)"/>
+    <path d="M0 0 C90 60 180 10 280 55 C360 90 400 40 400 40 L400 250 L0 250 Z" fill="url(#goldWave)"/>
+    <text x="36" y="48" fill="#FFFFFF" font-family="Arial, Helvetica, sans-serif" font-size="18" font-weight="700" letter-spacing="1.5">PAYSWAP</text>
+    <rect x="36" y="72" width="52" height="40" rx="6" fill="#B8860B"/>
+    <rect x="42" y="78" width="40" height="28" rx="3" fill="#D4AF37" opacity="0.85"/>
+    <rect x="46" y="84" width="8" height="6" rx="1" fill="#8B6914" opacity="0.5"/>
+    <rect x="58" y="84" width="8" height="6" rx="1" fill="#8B6914" opacity="0.5"/>
+    <rect x="70" y="84" width="8" height="6" rx="1" fill="#8B6914" opacity="0.5"/>
+    <text x="36" y="160" fill="#FFFFFF" font-family="ui-monospace, monospace" font-size="22" letter-spacing="3">4532  """"  """"  8190</text>
+    <text x="36" y="198" fill="#FFF8E7" font-family="Arial, Helvetica, sans-serif" font-size="12" letter-spacing="1.2">CARDHOLDER NAME</text>
+    <text x="36" y="218" fill="#FFF8E7" font-family="Arial, Helvetica, sans-serif" font-size="13" font-weight="600">VALID THRU  09/28</text>
+    <g transform="translate(310 175)">
+      <circle cx="18" cy="18" r="22" fill="#7EC8E3" opacity="0.95"/>
+      <circle cx="42" cy="18" r="22" fill="#E89B8C" opacity="0.9"/>
+      <circle cx="18" cy="40" r="22" fill="#C45C4A" opacity="0.85"/>
+      <circle cx="42" cy="40" r="22" fill="#2C2C2C" opacity="0.9"/>
+    </g>
+    <rect x="0" y="0" width="12" height="250" rx="2" fill="#8B6914" opacity="0.45"/>
+  </g>
+</svg>

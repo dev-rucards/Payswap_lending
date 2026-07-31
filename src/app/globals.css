@@ -1,0 +1,84 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ScrollSmoother owns the scroll position when it's active, so native smooth
+   scroll would fight it. Under reduced motion ScrollSmoother is never created
+   and anchor jumps should stay instant, which is the default. */
+html:has(#smooth-wrapper) {
+  scroll-behavior: auto;
+}
+
+/* Sections are translucent so the global WebGL layer reads through them.
+   The opaque page colour lives on <body>. */
+section {
+  @apply bg-darkmode/70;
+}
+
+/* Opt out per-section when a solid backdrop is needed (e.g. a section placed
+   over imagery where the ambient layer would reduce contrast). */
+section[data-solid-bg] {
+  @apply bg-darkmode;
+}
+
+/* Let the WebGL canvas show through: it sits at -z-10, body paints behind it. */
+#smooth-wrapper {
+  position: relative;
+  z-index: 1;
+}
+
+/* 3D primitives: shared perspective helpers */
+.perspective-1000 {
+  perspective: 1000px;
+}
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+/* Custom cursor: hide the native pointer wherever our GSAP cursor is active */
+html[data-custom-cursor],
+html[data-custom-cursor] a,
+html[data-custom-cursor] button {
+  cursor: none !important;
+}
+
+/* ...but text entry needs a real caret. Hiding the I-beam over inputs makes
+   forms feel broken, so the native cursor comes back for anything typeable. */
+html[data-custom-cursor] input,
+html[data-custom-cursor] textarea,
+html[data-custom-cursor] select,
+html[data-custom-cursor] [contenteditable="true"] {
+  cursor: auto !important;
+}
+
+.blog-details p, .blog-details hr {
+  @apply mb-8 ;
+}
+
+.blog-details hr {
+  @apply border-dark_border;
+}
+
+.blog-details strong {
+  @apply font-bold dark:text-white;
+}
+
+.blog-details ul {
+  @apply mb-8 list-inside list-disc space-y-3;
+}
+
+.blog-details ol {
+  @apply mb-8 list-inside list-decimal space-y-3;
+}
+
+.blog-details h1 {
+  @apply mb-8 text-3xl font-bold text-midnight_text dark:text-white sm:text-4xl md:text-[40px] md:leading-[1.28];
+}
+
+.blog-details h2 {
+  @apply mb-8 text-2xl font-bold text-midnight_text dark:text-white sm:text-3xl md:text-[35px] md:leading-[1.28];
+}
+
+.blog-details h3 {
+  @apply mb-6 text-2xl font-bold dark:text-white sm:text-[28px] sm:leading-[40px];
+}

@@ -1,0 +1,20 @@
+<svg width="520" height="420" viewBox="0 0 520 420" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <filter id="vsShadow" x="0" y="0" width="520" height="420" filterUnits="userSpaceOnUse">
+      <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+  <ellipse cx="260" cy="370" rx="150" ry="20" fill="#99E39E" fill-opacity="0.12"/>
+  <g filter="url(#vsShadow)">
+    <rect x="170" y="70" width="220" height="140" rx="18" transform="rotate(-14 280 140)" fill="#FFE500"/>
+    <text x="210" y="150" fill="#2874F0" font-family="Arial, sans-serif" font-size="20" font-weight="700" transform="rotate(-14 280 145)">Flipkart</text>
+    <rect x="150" y="110" width="220" height="140" rx="18" transform="rotate(-4 260 180)" fill="#FF3F6C"/>
+    <text x="195" y="190" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="20" font-weight="700" transform="rotate(-4 260 185)">Myntra</text>
+    <rect x="140" y="150" width="240" height="150" rx="20" fill="#111111" stroke="#99E39E" stroke-opacity="0.4"/>
+    <text x="190" y="230" fill="#99E39E" font-family="Arial, sans-serif" font-size="22" font-weight="700">Payswap</text>
+    <text x="190" y="258" fill="#FFFFFF" font-family="Arial, sans-serif" font-size="13" opacity="0.8">Brand Voucher</text>
+  </g>
+  <circle cx="420" cy="100" r="8" fill="#FC8019"/>
+  <circle cx="80" cy="220" r="6" fill="#FC2779"/>
+  <circle cx="440" cy="300" r="7" fill="#2874F0"/>
+</svg>

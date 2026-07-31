@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Hero hand/card diagnostic</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #000510; color: #fff;
+    font: 14px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    display: grid; grid-template-columns: 340px 1fr; min-height: 100vh;
+  }
+  aside { padding: 20px; border-right: 1px solid #ffffff1a; overflow-y: auto; }
+  h1 { font-size: 15px; margin: 0 0 4px; color: #99E39E; }
+  h2 { font-size: 12px; text-transform: uppercase; letter-spacing: .12em;
+       color: #ffffff66; margin: 22px 0 8px; font-weight: 600; }
+  label { display: flex; align-items: center; gap: 8px; padding: 5px 0; cursor: pointer; }
+  input[type=range] { width: 100%; }
+  .hint { color: #ffffff80; font-size: 12px; margin: 0 0 14px; }
+  pre { background: #ffffff0d; border: 1px solid #ffffff1a; border-radius: 6px;
+        padding: 10px; font-size: 11px; line-height: 1.5; overflow-x: auto;
+        white-space: pre-wrap; word-break: break-all; margin: 0; }
+  .stagewrap { position: relative; display: flex; align-items: center;
+               justify-content: center; padding: 24px; }
+  /* Mirrors the app: mockup > depth > cardStack > layers */
+  #mockup { position: relative; width: 100%; max-width: 760px; height: 82vh;
+            min-height: 560px; }
+  #depth  { position: absolute; inset: 0; display: flex;
+            align-items: flex-end; justify-content: flex-end;
+            will-change: transform; }
+  #stack  { position: relative; height: 100%; aspect-ratio: 416 / 847;
+            transform-style: preserve-3d; will-change: transform; }
+  #stack img { position: absolute; inset: 0; height: 100%; width: 100%;
+               object-fit: contain; user-select: none; pointer-events: none; }
+  .card { transform-style: flat; transform-origin: 50% 50%; }
+  .badge { position: absolute; bottom: 32px; left: 50%; transform: translateX(-50%);
+           z-index: 4; border: 1px solid #ffffff33; background: #000510cc;
+           padding: 6px 16px; border-radius: 999px; font-size: 13px;
+           backdrop-filter: blur(4px); }
+  .outline #stack { outline: 1px dashed #99E39E80; }
+  .outline #depth { outline: 1px dashed #1DC8CD80; }
+  .outline #mockup { outline: 1px dashed #ffffff40; }
+  .swatch { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:4px; }
+</style>
+</head>
+<body>
+<aside>
+  <h1>Hero hand/card diagnostic</h1>
+  <p class="hint">Reproduces the hero composite in isolation, with each
+  animation layer switchable. Turn things off one at a time until the artwork
+  looks right — whatever you turned off last is the culprit.</p>
+
+  <h2>Layers</h2>
+  <label><input type="checkbox" id="l-base" checked> hand-base.svg (behind)</label>
+  <label><input type="checkbox" id="l-card" checked> brand card (middle)</label>
+  <label><input type="checkbox" id="l-top" checked> hand-top.svg (fingers, front)</label>
+  <label><input type="checkbox" id="outline"> <span><span class="swatch" style="background:#fff"></span>show layer boxes</span></label>
+
+  <h2>Animations</h2>
+  <label><input type="checkbox" id="a-swap" checked> card swap (every 2.5s)</label>
+  <label><input type="checkbox" id="a-float" checked> idle float — y on #stack</label>
+  <label><input type="checkbox" id="a-tilt" checked> cursor tilt — rotateX/Y on #stack</label>
+
+  <h2>Scroll exit (simulated)</h2>
+  <p class="hint">Drag to scrub what the pinned scroll timeline does to
+  <code>#depth</code>. 0 = top of page.</p>
+  <input type="range" id="scrub" min="0" max="100" value="0">
+
+  <h2>Live computed state</h2>
+  <pre id="readout">…</pre>
+</aside>
+
+<div class="stagewrap">
+  <div id="mockup">
+    <div id="depth">
+      <div id="stack">
+        <img id="base" src="public/images/hero/hand-base.svg" alt="">
+        <!-- cards injected here -->
+        <img id="top" src="public/images/hero/hand-top.svg" alt="">
+        <div class="badge" id="badge">Payswap</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const CARDS = [
+  ["public/images/hero/card-payswap.svg",  "Payswap"],
+  ["public/images/hero/card-amazon.svg",   "Amazon"],
+  ["public/images/hero/card-flipkart.svg", "Flipkart"],
+  ["public/images/hero/card-myntra.svg",   "Myntra"],
+  ["public/images/hero/card-nykaa.svg",    "Nykaa"],
+  ["public/images/hero/card-ajio.svg",     "Ajio"],
+  ["public/images/hero/card-swiggy.svg",   "Swiggy"],
+];
+
+const stack = document.getElementById("stack");
+const depth = document.getElementById("depth");
+const top_  = document.getElementById("top");
+const base  = document.getElementById("base");
+const badge = document.getElementById("badge");
+
+// Build card layers between base and top, matching the app's z-order
+const cardEls = CARDS.map(([src, label], i) => {
+  const img = document.createElement("img");
+  img.src = src; img.alt = label; img.className = "card";
+  img.style.zIndex = 2;
+  img.style.opacity = i === 0 ? 1 : 0;
+  img.style.visibility = i === 0 ? "visible" : "hidden";
+  stack.insertBefore(img, top_);
+  return img;
+});
+base.style.zIndex = 1;
+top_.style.zIndex = 3;
+
+// Report any asset that fails to load — a 404 here explains a lot
+const failures = [];
+[base, top_, ...cardEls].forEach(img => {
+  img.addEventListener("error", () => { failures.push(img.getAttribute("src")); });
+});
+
+gsap.set(stack, { x: 12, transformPerspective: 1200, transformOrigin: "center" });
+
+let idx = 0, prev = 0, floatTween = null, swapTimer = null;
+
+function startFloat() {
+  stopFloat();
+  floatTween = gsap.to(stack, {
+    y: -16, duration: 2.6, ease: "sine.inOut", yoyo: true, repeat: -1
+  });
+}
+function stopFloat() {
+  if (floatTween) { floatTween.kill(); floatTween = null; }
+  gsap.set(stack, { y: 0 });
+}
+
+const rotX = gsap.quickTo(stack, "rotateX", { duration: .6, ease: "power3.out" });
+const rotY = gsap.quickTo(stack, "rotateY", { duration: .6, ease: "power3.out" });
+document.addEventListener("mousemove", e => {
+  if (!document.getElementById("a-tilt").checked) return;
+  const px = e.clientX / window.innerWidth - .5;
+  const py = e.clientY / window.innerHeight - .5;
+  rotY(px * 16); rotX(-py * 16);
+});
+
+function swap() {
+  prev = idx;
+  idx = (idx + 1) % CARDS.length;
+  const out = cardEls[prev], inc = cardEls[idx];
+  gsap.to(out,  { autoAlpha: 0, scale: .965, duration: .45, ease: "power2.inOut", overwrite: "auto" });
+  gsap.fromTo(inc, { autoAlpha: 0, scale: 1.035 },
+                   { autoAlpha: 1, scale: 1, duration: .55, ease: "power2.out",
+                     overwrite: "auto", delay: .12 });
+  badge.textContent = CARDS[idx][1];
+}
+function startSwap() { stopSwap(); swapTimer = setInterval(swap, 2500); }
+function stopSwap()  { if (swapTimer) { clearInterval(swapTimer); swapTimer = null; } }
+
+document.getElementById("scrub").addEventListener("input", e => {
+  const p = e.target.value / 100;
+  gsap.set(depth, {
+    z: -260 * p, y: 40 * p,
+    autoAlpha: 1 - .85 * p,
+    transformPerspective: 1200, force3D: true
+  });
+});
+
+const bind = (id, on, off) =>
+  document.getElementById(id).addEventListener("change", e =>
+    e.target.checked ? on() : off());
+
+bind("a-float", startFloat, stopFloat);
+bind("a-swap",  startSwap,  stopSwap);
+bind("a-tilt",  () => {}, () => gsap.to(stack, { rotateX: 0, rotateY: 0, duration: .4 }));
+bind("l-base", () => base.style.display = "", () => base.style.display = "none");
+bind("l-top",  () => top_.style.display = "", () => top_.style.display = "none");
+bind("l-card", () => cardEls.forEach(c => c.style.display = ""),
+               () => cardEls.forEach(c => c.style.display = "none"));
+bind("outline", () => document.body.classList.add("outline"),
+                () => document.body.classList.remove("outline"));
+
+startFloat(); startSwap();
+
+// Live readout: the numbers I actually need to see
+const readout = document.getElementById("readout");
+setInterval(() => {
+  const r = stack.getBoundingClientRect();
+  const active = cardEls[idx];
+  const cs = getComputedStyle(active);
+  readout.textContent =
+`#stack box   ${Math.round(r.width)} x ${Math.round(r.height)}  (expect ratio 0.491)
+   ratio     ${(r.width / r.height).toFixed(3)}
+#stack xform ${getComputedStyle(stack).transform.replace(/, /g, ",")}
+#depth xform ${getComputedStyle(depth).transform.replace(/, /g, ",")}
+
+active card  [${idx}] ${CARDS[idx][1]}
+   opacity   ${cs.opacity}
+   visible   ${cs.visibility}
+   xform     ${cs.transform.replace(/, /g, ",")}
+   natural   ${active.naturalWidth} x ${active.naturalHeight}
+
+failed to load: ${failures.length ? failures.join(", ") : "none"}`;
+}, 250);
+</script>
+</body>
+</html>
